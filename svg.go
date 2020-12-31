@@ -823,6 +823,17 @@ func (svg *SVG) Animate(link, attr string, from, to int, duration float64, repea
 		href(link), attr, from, to, duration, repeatString(repeat), endstyle(s, emptyclose))
 }
 
+// AnimateValues animates the specified link, using the specified attribute.
+// The animation utilizes the values field.
+func (svg *SVG) AnimateValues(link, attr string, values []string, duration float64, repeat int, s ...string) {
+	valuesString := ""
+	for _, v := range values {
+		valuesString = valuesString + v + ";"
+	}
+	svg.printf(`<animate %s attributeName="%s" values="%s" dur="%gs" repeatCount="%s" %s`,
+		href(link), attr, valuesString, duration, repeatString(repeat), endstyle(s, emptyclose))
+}
+
 // AnimateMotion animates the referenced object along the specified path
 func (svg *SVG) AnimateMotion(link, path string, duration float64, repeat int, s ...string) {
 	svg.printf(`<animateMotion %s dur="%gs" repeatCount="%s" %s<mpath %s/></animateMotion>
