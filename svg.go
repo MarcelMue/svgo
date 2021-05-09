@@ -202,8 +202,10 @@ func (svg *SVG) TranslateRotate(x, y int, r float64) {
 }
 
 // RotateTranslate rotates the coordinate system r degrees, then translates to (x,y), end with Gend()
-func (svg *SVG) RotateTranslate(x, y int, r float64) {
+func (svg *SVG) RotateTranslate(x, y int, r float64, f func()) {
 	svg.Gtransform(rotate(r) + " " + translate(x, y))
+	f()
+	svg.Gend()
 }
 
 // Group begins a group with arbitrary attributes
