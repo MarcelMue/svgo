@@ -170,6 +170,7 @@ func (svg *SVG) Style(scriptype string, data ...string) {
 // Standard Reference: http://www.w3.org/TR/SVG11/struct.html#GElement
 func (svg *SVG) Gstyle(s string, f func()) {
 	svg.println(group("style", s))
+	f()
 	svg.gend()
 }
 
@@ -177,7 +178,7 @@ func (svg *SVG) Gstyle(s string, f func()) {
 // Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
 func (svg *SVG) Gtransform(s string) { svg.println(group("transform", s)) }
 
-// Translate begins coordinate translation, end with Gend()
+// Translate begins coordinate translation
 // Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
 func (svg *SVG) Translate(x, y int, f func()) {
 	svg.Gtransform(translate(x, y))
@@ -185,7 +186,7 @@ func (svg *SVG) Translate(x, y int, f func()) {
 	svg.gend()
 }
 
-// Scale scales the coordinate system by n, end with Gend()
+// Scale scales the coordinate system by n
 // Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
 func (svg *SVG) Scale(n float64, f func()) {
 	svg.Gtransform(scale(n))
@@ -193,7 +194,7 @@ func (svg *SVG) Scale(n float64, f func()) {
 	svg.gend()
 }
 
-// ScaleXY scales the coordinate system by dx and dy, end with Gend()
+// ScaleXY scales the coordinate system by dx and dy
 // Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
 func (svg *SVG) ScaleXY(dx, dy float64, f func()) {
 	svg.Gtransform(scaleXY(dx, dy))
@@ -201,7 +202,7 @@ func (svg *SVG) ScaleXY(dx, dy float64, f func()) {
 	svg.gend()
 }
 
-// SkewX skews the x coordinate system by angle a, end with Gend()
+// SkewX skews the x coordinate system by angle a
 // Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
 func (svg *SVG) SkewX(a float64, f func()) {
 	svg.Gtransform(skewX(a))
@@ -209,7 +210,7 @@ func (svg *SVG) SkewX(a float64, f func()) {
 	svg.gend()
 }
 
-// SkewY skews the y coordinate system by angle a, end with Gend()
+// SkewY skews the y coordinate system by angle a
 // Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
 func (svg *SVG) SkewY(a float64, f func()) {
 	svg.Gtransform(skewY(a))
@@ -217,7 +218,7 @@ func (svg *SVG) SkewY(a float64, f func()) {
 	svg.gend()
 }
 
-// SkewXY skews x and y coordinates by ax, ay respectively, end with Gend()
+// SkewXY skews x and y coordinates by ax, ay respectively
 // Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
 func (svg *SVG) SkewXY(ax, ay float64, f func()) {
 	svg.Gtransform(skewX(ax) + " " + skewY(ay))
@@ -225,7 +226,7 @@ func (svg *SVG) SkewXY(ax, ay float64, f func()) {
 	svg.gend()
 }
 
-// Rotate rotates the coordinate system by r degrees, end with Gend()
+// Rotate rotates the coordinate system by r degrees
 // Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
 func (svg *SVG) Rotate(r float64, f func()) {
 	svg.Gtransform(rotate(r))
@@ -233,14 +234,14 @@ func (svg *SVG) Rotate(r float64, f func()) {
 	svg.gend()
 }
 
-// TranslateRotate translates the coordinate system to (x,y), then rotates to r degrees, end with Gend()
+// TranslateRotate translates the coordinate system to (x,y), then rotates to r degrees
 func (svg *SVG) TranslateRotate(x, y int, r float64, f func()) {
 	svg.Gtransform(translate(x, y) + " " + rotate(r))
 	f()
 	svg.gend()
 }
 
-// RotateTranslate rotates the coordinate system r degrees, then translates to (x,y), end with Gend()
+// RotateTranslate rotates the coordinate system r degrees, then translates to (x,y)
 func (svg *SVG) RotateTranslate(x, y int, r float64, f func()) {
 	svg.Gtransform(rotate(r) + " " + translate(x, y))
 	f()
