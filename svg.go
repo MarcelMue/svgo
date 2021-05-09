@@ -83,6 +83,12 @@ func (svg *SVG) genattr(ns []string) {
 	svg.println(svgns)
 }
 
+// defEnd ends a defintion block.
+func (svg *SVG) defEnd() { svg.println(`</defs>`) }
+
+// Gend ends a group (must be paired with Gsttyle, Gtransform, Gid).
+func (svg *SVG) gend() { svg.println(`</g>`) }
+
 // Structure, Metadata, Scripting, Style, Transformation, and Links
 
 // Start begins the SVG document with the width w and height h.
@@ -162,62 +168,99 @@ func (svg *SVG) Style(scriptype string, data ...string) {
 
 // Gstyle begins a group, with the specified style.
 // Standard Reference: http://www.w3.org/TR/SVG11/struct.html#GElement
-func (svg *SVG) Gstyle(s string) { svg.println(group("style", s)) }
+func (svg *SVG) Gstyle(s string, f func()) {
+	svg.println(group("style", s))
+	f()
+	svg.gend()
+}
 
 // Gtransform begins a group, with the specified transform
 // Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
 func (svg *SVG) Gtransform(s string) { svg.println(group("transform", s)) }
 
-// Translate begins coordinate translation, end with Gend()
+// Translate begins coordinate translation
 // Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
-func (svg *SVG) Translate(x, y int) { svg.Gtransform(translate(x, y)) }
-
-// Scale scales the coordinate system by n, end with Gend()
-// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
-func (svg *SVG) Scale(n float64) { svg.Gtransform(scale(n)) }
-
-// ScaleXY scales the coordinate system by dx and dy, end with Gend()
-// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
-func (svg *SVG) ScaleXY(dx, dy float64) { svg.Gtransform(scaleXY(dx, dy)) }
-
-// SkewX skews the x coordinate system by angle a, end with Gend()
-// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
-func (svg *SVG) SkewX(a float64) { svg.Gtransform(skewX(a)) }
-
-// SkewY skews the y coordinate system by angle a, end with Gend()
-// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
-func (svg *SVG) SkewY(a float64) { svg.Gtransform(skewY(a)) }
-
-// SkewXY skews x and y coordinates by ax, ay respectively, end with Gend()
-// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
-func (svg *SVG) SkewXY(ax, ay float64) { svg.Gtransform(skewX(ax) + " " + skewY(ay)) }
-
-// Rotate rotates the coordinate system by r degrees, end with Gend()
-// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
-func (svg *SVG) Rotate(r float64) { svg.Gtransform(rotate(r)) }
-
-// TranslateRotate translates the coordinate system to (x,y), then rotates to r degrees, end with Gend()
-func (svg *SVG) TranslateRotate(x, y int, r float64) {
-	svg.Gtransform(translate(x, y) + " " + rotate(r))
+func (svg *SVG) Translate(x, y int, f func()) {
+	svg.Gtransform(translate(x, y))
+	f()
+	svg.gend()
 }
 
-// RotateTranslate rotates the coordinate system r degrees, then translates to (x,y), end with Gend()
-func (svg *SVG) RotateTranslate(x, y int, r float64) {
+// Scale scales the coordinate system by n
+// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
+func (svg *SVG) Scale(n float64, f func()) {
+	svg.Gtransform(scale(n))
+	f()
+	svg.gend()
+}
+
+// ScaleXY scales the coordinate system by dx and dy
+// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
+func (svg *SVG) ScaleXY(dx, dy float64, f func()) {
+	svg.Gtransform(scaleXY(dx, dy))
+	f()
+	svg.gend()
+}
+
+// SkewX skews the x coordinate system by angle a
+// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
+func (svg *SVG) SkewX(a float64, f func()) {
+	svg.Gtransform(skewX(a))
+	f()
+	svg.gend()
+}
+
+// SkewY skews the y coordinate system by angle a
+// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
+func (svg *SVG) SkewY(a float64, f func()) {
+	svg.Gtransform(skewY(a))
+	f()
+	svg.gend()
+}
+
+// SkewXY skews x and y coordinates by ax, ay respectively
+// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
+func (svg *SVG) SkewXY(ax, ay float64, f func()) {
+	svg.Gtransform(skewX(ax) + " " + skewY(ay))
+	f()
+	svg.gend()
+}
+
+// Rotate rotates the coordinate system by r degrees
+// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
+func (svg *SVG) Rotate(r float64, f func()) {
+	svg.Gtransform(rotate(r))
+	f()
+	svg.gend()
+}
+
+// TranslateRotate translates the coordinate system to (x,y), then rotates to r degrees
+func (svg *SVG) TranslateRotate(x, y int, r float64, f func()) {
+	svg.Gtransform(translate(x, y) + " " + rotate(r))
+	f()
+	svg.gend()
+}
+
+// RotateTranslate rotates the coordinate system r degrees, then translates to (x,y)
+func (svg *SVG) RotateTranslate(x, y int, r float64, f func()) {
 	svg.Gtransform(rotate(r) + " " + translate(x, y))
+	f()
+	svg.gend()
 }
 
 // Group begins a group with arbitrary attributes
 func (svg *SVG) Group(s ...string) { svg.printf("<g %s\n", endstyle(s, `>`)) }
 
 // Gid begins a group, with the specified id
-func (svg *SVG) Gid(s string) {
+func (svg *SVG) Gid(s string, f func()) {
 	svg.print(`<g id="`)
 	xml.Escape(svg.Writer, []byte(s))
 	svg.println(`">`)
-}
 
-// Gend ends a group (must be paired with Gsttyle, Gtransform, Gid).
-func (svg *SVG) Gend() { svg.println(`</g>`) }
+	f()
+
+	svg.gend()
+}
 
 // ClipPath defines a clip path
 func (svg *SVG) ClipPath(s ...string) { svg.printf(`<clipPath %s`, endstyle(s, `>`)) }
@@ -229,10 +272,13 @@ func (svg *SVG) ClipEnd() {
 
 // Def begins a defintion block.
 // Standard Reference: http://www.w3.org/TR/SVG11/struct.html#DefsElement
-func (svg *SVG) Def() { svg.println(`<defs>`) }
+func (svg *SVG) Def(f func()) {
+	svg.println(`<defs>`)
 
-// DefEnd ends a defintion block.
-func (svg *SVG) DefEnd() { svg.println(`</defs>`) }
+	f()
+
+	svg.defEnd()
+}
 
 // Marker defines a marker
 // Standard reference: http://www.w3.org/TR/SVG11/painting.html#MarkerElement
@@ -447,12 +493,12 @@ func (svg *SVG) Textpath(t string, pathid string, s ...string) {
 // Textlines places a series of lines of text starting at x,y, at the specified size, fill, and alignment.
 // Each line is spaced according to the spacing argument
 func (svg *SVG) Textlines(x, y int, s []string, size, spacing int, fill, align string) {
-	svg.Gstyle(fmt.Sprintf("font-size:%dpx;fill:%s;text-anchor:%s", size, fill, align))
-	for _, t := range s {
-		svg.Text(x, y, t)
-		y += spacing
-	}
-	svg.Gend()
+	svg.Gstyle(fmt.Sprintf("font-size:%dpx;fill:%s;text-anchor:%s", size, fill, align), func() {
+		for _, t := range s {
+			svg.Text(x, y, t)
+			y += spacing
+		}
+	})
 }
 
 // Colors
@@ -898,12 +944,8 @@ func (svg *SVG) AnimateSkewY(link string, from, to, duration float64, repeat int
 
 // Utility
 
-// Grid draws a grid at the specified coordinate, dimensions, and spacing, with optional style.
-func (svg *SVG) Grid(x int, y int, w int, h int, n int, s ...string) {
-
-	if len(s) > 0 {
-		svg.Gstyle(s[0])
-	}
+// Grid draws a grid at the specified coordinate, dimensions, and spacing
+func (svg *SVG) Grid(x int, y int, w int, h int, n int) {
 	for ix := x; ix <= x+w; ix += n {
 		svg.Line(ix, y, ix, y+h)
 	}
@@ -911,10 +953,6 @@ func (svg *SVG) Grid(x int, y int, w int, h int, n int, s ...string) {
 	for iy := y; iy <= y+h; iy += n {
 		svg.Line(x, iy, x+w, iy)
 	}
-	if len(s) > 0 {
-		svg.Gend()
-	}
-
 }
 
 // Support functions
