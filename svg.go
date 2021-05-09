@@ -83,6 +83,12 @@ func (svg *SVG) genattr(ns []string) {
 	svg.println(svgns)
 }
 
+// defEnd ends a defintion block.
+func (svg *SVG) defEnd() { svg.println(`</defs>`) }
+
+// Gend ends a group (must be paired with Gsttyle, Gtransform, Gid).
+func (svg *SVG) gend() { svg.println(`</g>`) }
+
 // Structure, Metadata, Scripting, Style, Transformation, and Links
 
 // Start begins the SVG document with the width w and height h.
@@ -205,21 +211,22 @@ func (svg *SVG) TranslateRotate(x, y int, r float64) {
 func (svg *SVG) RotateTranslate(x, y int, r float64, f func()) {
 	svg.Gtransform(rotate(r) + " " + translate(x, y))
 	f()
-	svg.Gend()
+	svg.gend()
 }
 
 // Group begins a group with arbitrary attributes
 func (svg *SVG) Group(s ...string) { svg.printf("<g %s\n", endstyle(s, `>`)) }
 
 // Gid begins a group, with the specified id
-func (svg *SVG) Gid(s string) {
+func (svg *SVG) Gid(s string, f func()) {
 	svg.print(`<g id="`)
 	xml.Escape(svg.Writer, []byte(s))
 	svg.println(`">`)
-}
 
-// Gend ends a group (must be paired with Gsttyle, Gtransform, Gid).
-func (svg *SVG) Gend() { svg.println(`</g>`) }
+	f()
+
+	svg.gend()
+}
 
 // ClipPath defines a clip path
 func (svg *SVG) ClipPath(s ...string) { svg.printf(`<clipPath %s`, endstyle(s, `>`)) }
@@ -231,10 +238,13 @@ func (svg *SVG) ClipEnd() {
 
 // Def begins a defintion block.
 // Standard Reference: http://www.w3.org/TR/SVG11/struct.html#DefsElement
-func (svg *SVG) Def() { svg.println(`<defs>`) }
+func (svg *SVG) Def(f func()) {
+	svg.println(`<defs>`)
 
-// DefEnd ends a defintion block.
-func (svg *SVG) DefEnd() { svg.println(`</defs>`) }
+	f()
+
+	svg.defEnd()
+}
 
 // Marker defines a marker
 // Standard reference: http://www.w3.org/TR/SVG11/painting.html#MarkerElement
@@ -454,7 +464,7 @@ func (svg *SVG) Textlines(x, y int, s []string, size, spacing int, fill, align s
 		svg.Text(x, y, t)
 		y += spacing
 	}
-	svg.Gend()
+	svg.gend()
 }
 
 // Colors
@@ -914,7 +924,7 @@ func (svg *SVG) Grid(x int, y int, w int, h int, n int, s ...string) {
 		svg.Line(x, iy, x+w, iy)
 	}
 	if len(s) > 0 {
-		svg.Gend()
+		svg.gend()
 	}
 
 }
