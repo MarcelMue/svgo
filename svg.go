@@ -168,7 +168,10 @@ func (svg *SVG) Style(scriptype string, data ...string) {
 
 // Gstyle begins a group, with the specified style.
 // Standard Reference: http://www.w3.org/TR/SVG11/struct.html#GElement
-func (svg *SVG) Gstyle(s string) { svg.println(group("style", s)) }
+func (svg *SVG) Gstyle(s string, f func()) {
+	svg.println(group("style", s))
+	svg.gend()
+}
 
 // Gtransform begins a group, with the specified transform
 // Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
@@ -489,12 +492,12 @@ func (svg *SVG) Textpath(t string, pathid string, s ...string) {
 // Textlines places a series of lines of text starting at x,y, at the specified size, fill, and alignment.
 // Each line is spaced according to the spacing argument
 func (svg *SVG) Textlines(x, y int, s []string, size, spacing int, fill, align string) {
-	svg.Gstyle(fmt.Sprintf("font-size:%dpx;fill:%s;text-anchor:%s", size, fill, align))
-	for _, t := range s {
-		svg.Text(x, y, t)
-		y += spacing
-	}
-	svg.gend()
+	svg.Gstyle(fmt.Sprintf("font-size:%dpx;fill:%s;text-anchor:%s", size, fill, align), func() {
+		for _, t := range s {
+			svg.Text(x, y, t)
+			y += spacing
+		}
+	})
 }
 
 // Colors
@@ -940,12 +943,8 @@ func (svg *SVG) AnimateSkewY(link string, from, to, duration float64, repeat int
 
 // Utility
 
-// Grid draws a grid at the specified coordinate, dimensions, and spacing, with optional style.
-func (svg *SVG) Grid(x int, y int, w int, h int, n int, s ...string) {
-
-	if len(s) > 0 {
-		svg.Gstyle(s[0])
-	}
+// Grid draws a grid at the specified coordinate, dimensions, and spacing
+func (svg *SVG) Grid(x int, y int, w int, h int, n int) {
 	for ix := x; ix <= x+w; ix += n {
 		svg.Line(ix, y, ix, y+h)
 	}
@@ -953,10 +952,6 @@ func (svg *SVG) Grid(x int, y int, w int, h int, n int, s ...string) {
 	for iy := y; iy <= y+h; iy += n {
 		svg.Line(x, iy, x+w, iy)
 	}
-	if len(s) > 0 {
-		svg.gend()
-	}
-
 }
 
 // Support functions
