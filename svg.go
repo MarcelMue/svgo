@@ -186,6 +186,14 @@ func (svg *SVG) Translate(x, y int, f func()) {
 	svg.gend()
 }
 
+// Translate begins coordinate translation
+// Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
+func (svg *SVG) Translatef64(x, y float64, f func()) {
+	svg.Gtransform(translatef64(x, y))
+	f()
+	svg.gend()
+}
+
 // Scale scales the coordinate system by n
 // Standard Reference: http://www.w3.org/TR/SVG11/coords.html#TransformAttribute
 func (svg *SVG) Scale(n float64, f func()) {
@@ -362,8 +370,8 @@ func (svg *SVG) Polygon(x []int, y []int, s ...string) {
 
 // Polygon draws a series of line segments using an array of x, y coordinates, with optional style.
 // Standard Reference: http://www.w3.org/TR/SVG11/shapes.html#PolygonElement
-func (svg *SVG) Polygonfloat64(x []float64, y []float64, s ...string) {
-	svg.polyfloat64(x, y, "polygon", s...)
+func (svg *SVG) Polygonf64(x []float64, y []float64, s ...string) {
+	svg.polyf64(x, y, "polygon", s...)
 }
 
 // Rect draws a rectangle with upper left-hand corner at x,y, with width w, and height h, with optional style
@@ -1005,7 +1013,7 @@ func (svg *SVG) pp(x []int, y []int, tag string) {
 }
 
 // pp returns a series of polygon points
-func (svg *SVG) ppfloat64(x []float64, y []float64, tag string) {
+func (svg *SVG) ppf64(x []float64, y []float64, tag string) {
 	svg.print(tag)
 	if len(x) != len(y) {
 		svg.print(" ")
@@ -1050,8 +1058,8 @@ func (svg *SVG) poly(x []int, y []int, tag string, s ...string) {
 }
 
 // poly compiles the polygon element
-func (svg *SVG) polyfloat64(x []float64, y []float64, tag string, s ...string) {
-	svg.ppfloat64(x, y, "<"+tag+" points=\"")
+func (svg *SVG) polyf64(x []float64, y []float64, tag string, s ...string) {
+	svg.ppf64(x, y, "<"+tag+" points=\"")
 	svg.print(`" ` + endstyle(s, "/>\n"))
 }
 
@@ -1097,6 +1105,9 @@ func rotate(r float64) string { return fmt.Sprintf(`rotate(%g)`, r) }
 
 // translate returns the translate string for the transform
 func translate(x, y int) string { return fmt.Sprintf(`translate(%d,%d)`, x, y) }
+
+// translate returns the translate string for the transform
+func translatef64(x, y float64) string { return fmt.Sprintf(`translate(%f,%f)`, x, y) }
 
 // coord returns a coordinate string
 func coord(x int, y int) string { return fmt.Sprintf(`%d,%d`, x, y) }
