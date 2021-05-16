@@ -360,6 +360,12 @@ func (svg *SVG) Polygon(x []int, y []int, s ...string) {
 	svg.poly(x, y, "polygon", s...)
 }
 
+// Polygon draws a series of line segments using an array of x, y coordinates, with optional style.
+// Standard Reference: http://www.w3.org/TR/SVG11/shapes.html#PolygonElement
+func (svg *SVG) Polygonfloat64(x []float64, y []float64, s ...string) {
+	svg.polyfloat64(x, y, "polygon", s...)
+}
+
 // Rect draws a rectangle with upper left-hand corner at x,y, with width w, and height h, with optional style
 // Standard Reference: http://www.w3.org/TR/SVG11/shapes.html#RectElement
 func (svg *SVG) Rect(x int, y int, w int, h int, s ...string) {
@@ -998,6 +1004,20 @@ func (svg *SVG) pp(x []int, y []int, tag string) {
 	svg.print(coord(x[lx], y[lx]))
 }
 
+// pp returns a series of polygon points
+func (svg *SVG) ppfloat64(x []float64, y []float64, tag string) {
+	svg.print(tag)
+	if len(x) != len(y) {
+		svg.print(" ")
+		return
+	}
+	lx := len(x) - 1
+	for i := 0; i < lx; i++ {
+		svg.print(coordfloat64(x[i], y[i]) + " ")
+	}
+	svg.print(coordfloat64(x[lx], y[lx]))
+}
+
 // endstyle modifies an SVG object, with either a series of name="value" pairs,
 // or a single string containing a style
 func endstyle(s []string, endtag string) string {
@@ -1026,6 +1046,12 @@ func (svg *SVG) tt(tag string, s string) {
 // poly compiles the polygon element
 func (svg *SVG) poly(x []int, y []int, tag string, s ...string) {
 	svg.pp(x, y, "<"+tag+" points=\"")
+	svg.print(`" ` + endstyle(s, "/>\n"))
+}
+
+// poly compiles the polygon element
+func (svg *SVG) polyfloat64(x []float64, y []float64, tag string, s ...string) {
+	svg.ppfloat64(x, y, "<"+tag+" points=\"")
 	svg.print(`" ` + endstyle(s, "/>\n"))
 }
 
@@ -1074,6 +1100,9 @@ func translate(x, y int) string { return fmt.Sprintf(`translate(%d,%d)`, x, y) }
 
 // coord returns a coordinate string
 func coord(x int, y int) string { return fmt.Sprintf(`%d,%d`, x, y) }
+
+// coord returns a coordinate string
+func coordfloat64(x float64, y float64) string { return fmt.Sprintf(`%f,%f`, x, y) }
 
 // ptag returns the beginning of the path element
 func ptag(x int, y int) string { return fmt.Sprintf(`<path d="M%s`, coord(x, y)) }
